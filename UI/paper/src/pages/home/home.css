@@ -1,0 +1,9 @@
+.news:hover{
+    height: 20%;
+    width: 100%;
+    box-shadow: 6px 5px 15px;
+}
+
+.news{
+    padding: 70%;
+}

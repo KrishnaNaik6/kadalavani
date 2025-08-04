@@ -1,0 +1,210 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id         Int       @id @default(autoincrement())
+  bio        String?
+  user       User      @relation(fields: [user_id], references: [id])
+  user_id    Int       @unique
+  deleted_at DateTime? @db.Timestamp(6)
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  updated_at DateTime  @updatedAt @db.Timestamp(6)
+}
+
+model User {
+  id                    Int        @id @default(autoincrement())
+  email                 String     @unique
+  phone                 String?    @unique
+  first_name            String
+  middle_name           String?
+  last_name             String?
+  password_hash         String?
+  passsword_reset_token String?
+  num_login             Int?
+  num_logout            Int?
+  status                Int
+  deleted_at            DateTime?  @db.Timestamp(6)
+  created_at            DateTime   @default(now()) @db.Timestamp(6)
+  updated_at            DateTime   @updatedAt @db.Timestamp(6)
+  profile               Profile?
+  employee              Employee?
+  Article               Article[]
+  Comment               Comment[]
+  Like                  Like[]
+  Bookmark              Bookmark[]
+}
+
+model Employee {
+  id             Int          @id @default(autoincrement())
+  employee_id    String       @unique
+  department_id  Int?
+  department     Department?  @relation(fields: [department_id], references: [id])
+  join_date      DateTime
+  releving_date  DateTime?
+  user_id        Int          @unique
+  user           User         @relation(fields: [user_id], references: [id])
+  designation_id Int?         @unique
+  designation    Designation? @relation(fields: [designation_id], references: [id])
+  deleted_at     DateTime?    @db.Timestamp(6)
+  created_at     DateTime     @default(now()) @db.Timestamp(6)
+  updated_at     DateTime     @updatedAt @db.Timestamp(6)
+}
+
+model Department {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  description String
+  status      Int
+  deleted_at  DateTime?  @db.Timestamp(6)
+  created_at  DateTime   @default(now()) @db.Timestamp(6)
+  updated_at  DateTime   @updatedAt @db.Timestamp(6)
+  employees   Employee[]
+}
+
+model Role {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String
+  status          Int
+  deleted_at      DateTime?        @db.Timestamp(6)
+  created_at      DateTime         @default(now()) @db.Timestamp(6)
+  updated_at      DateTime         @updatedAt @db.Timestamp(6)
+  designationRole DesignationRole?
+}
+
+model Permission {
+  id         Int      @id @default(autoincrement())
+  status     Int
+  action     String
+  resource   String
+  scope      String
+  settings   Json?
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Designation {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String
+  status          Int
+  deleted_at      DateTime?        @db.Timestamp(6)
+  created_at      DateTime         @default(now()) @db.Timestamp(6)
+  updated_at      DateTime         @updatedAt @db.Timestamp(6)
+  designationRole DesignationRole?
+  employees       Employee[]
+}
+
+model DesignationRole {
+  id             Int         @id @default(autoincrement())
+  role_id        Int         @unique
+  designation_id Int         @unique
+  role           Role        @relation(fields: [role_id], references: [id])
+  designation    Designation @relation(fields: [designation_id], references: [id])
+}
+
+model Article {
+  id              Int               @id @default(autoincrement())
+  title           Json
+  content         Json
+  images          String[]
+  author          User?             @relation(fields: [author_id], references: [id])
+  author_id       Int?
+  published_at    DateTime?
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  comments        Comment[]
+  likes           Like[]
+  bookmarks       Bookmark[]
+  categories      Category[]        @relation("ArticleCategory")
+  tags            Tag[]
+  ArticleCategory ArticleCategory[]
+  ArticleTag      ArticleTag[]
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+
+  name            Json
+  description     Json?
+  status          Int
+  parent_id       Int?
+  parent          Category?         @relation("SubCategories", fields: [parent_id], references: [id])
+  sub_ategories   Category[]        @relation("SubCategories")
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  articles        Article[]         @relation("ArticleCategory")
+  ArticleCategory ArticleCategory[]
+}
+
+model ArticleCategory {
+  id          Int      @id @default(autoincrement())
+  article     Article  @relation(fields: [article_id], references: [id])
+  article_id  Int
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  article    Article  @relation(fields: [article_id], references: [id])
+  article_id Int
+  content    Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  article    Article  @relation(fields: [article_id], references: [id])
+  article_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Bookmark {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  article    Article  @relation(fields: [article_id], references: [id])
+  article_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Tag {
+  id          Int          @id @default(autoincrement())
+  name        Json
+  description Json?
+  status      Int
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  articles    ArticleTag[]
+  Article     Article?     @relation(fields: [articleId], references: [id])
+  articleId   Int?
+}
+
+model ArticleTag {
+  id         Int      @id @default(autoincrement())
+  article    Article  @relation(fields: [article_id], references: [id])
+  article_id Int
+  tag        Tag      @relation(fields: [tag_id], references: [id])
+  tag_id     Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

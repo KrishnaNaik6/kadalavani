@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id          Int      @id @default(autoincrement()) @map(name: "users")
+  first_name  String   @map(name: "first_name")
+  last_name   String   @map(name: "last_name")
+  middle_name String?  @map(name: "middle_name")
+  email       String   @unique @map(name: "email")
+  phone       String   @unique @map(name: "phone")
+  password    String   @map(name: "password")
+  role_id     Int?     @map(name: "role_id")
+  status      Int      @map(name: "status")
+  created_at  DateTime @default(now()) @map(name: "created_at")
+  updated_at  DateTime @updatedAt @map(name: "updated_at")
+  Role        roles?   @relation(fields: [role_id], references: [id])
+}
+
+model roles {
+  id         Int      @id @default(autoincrement()) @map(name: "roles")
+  name       String   @map(name: "name")
+  status     Int      @map(name: "status")
+  created_at DateTime @default(now()) @map(name: "created_at")
+  updated_at DateTime @updatedAt @map(name: "updated_at")
+  User       users[]
+}
+
+model article_types {
+  id          Int        @id @default(autoincrement()) @map(name: "id")
+  name        String     @map(name: "name")
+  description String     @map(name: "description")
+  articles    articles[] // No need to map this, as it's a relation
+  created_at  DateTime   @default(now()) @map(name: "created_at")
+  updated_at  DateTime   @updatedAt @map(name: "updated_at")
+}
+
+model articles {
+  id              Int              @id @default(autoincrement()) @map(name: "id")
+  title           String           @map(name: "title")
+  content         String           @map(name: "content")
+  author          String           @map(name: "author")
+  publicationDate DateTime         @map(name: "publication_date")
+  status          Int              @map(name: "status")
+  tags            String[]         @map(name: "tags")
+  article_type    article_types    @relation(fields: [article_type_id], references: [id])
+  article_type_id Int              @map(name: "article_type_id")
+  article_images  article_images[] // No need to map this, as it's a relation
+
+  latitude   Float
+  longitude  Float
+  city       String   @map(name: "city")
+  district   String   @map(name: "district")
+  state      String   @map(name: "state")
+  pinCode    String   @map(name: "pin_code")
+  country    String   @map(name: "country")
+  taluk      String   @map(name: "taluk")
+  created_at DateTime @default(now()) @map(name: "created_at")
+  updated_at DateTime @updatedAt @map(name: "updated_at")
+}
+
+model article_images {
+  id         Int      @id @default(autoincrement()) @map(name: "id")
+  url        String   @map(name: "url")
+  altText    String   @map(name: "alt_text")
+  article_id Int      @map(name: "article_id")
+  article    articles @relation(fields: [article_id], references: [id])
+}

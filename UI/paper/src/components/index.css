@@ -1,0 +1,11 @@
+*{
+    box-sizing: border-box;
+}
+
+.categories:hover{
+    color: rgb(255, 191, 191);
+
+}
+.categories:active{
+    border-bottom: 2px solid white;
+}
