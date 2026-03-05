@@ -47,20 +47,24 @@ export const CategoriesProvider = ({ children }) => {
     categoryDrawerState,
     editData,
   };
-  const loadCategories = () => {
-    // Implement your login logic here
-    // setCategories = [];
-    exec({ limit: 1000 });
-  };
+  // const loadCategories = () => {
+  //   // Implement your login logic here
+  //   // setCategories = [];
+  //   exec({ limit: 1000 });
+  // };
 
-  const createCategory = () => {
-    // Implement your login logic here
-    // setCategories = [];
-  };
+  // const createCategory = () => {
+  //   // Implement your login logic here
+  //   // setCategories = [];
+  // };
+
+  // useEffect(() => {
+  //   loadCategories();
+  // }, [loadCategories]);
 
   useEffect(() => {
-    loadCategories();
-  }, []);
+    exec({ limit: 1000 });
+  }, [exec]);
   return (
     <CategoriesContext.Provider
       value={{ categories, actions, states, data, status, exec }}
